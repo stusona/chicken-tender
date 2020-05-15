@@ -41,11 +41,13 @@ void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   lcd.print("Coop-Control    ");
-  lcd.setCursor(0,1);
-  lcd.print("Set Temp: ");
-  lcd.print(setTemp);
   delay(3000);
   lcd.clear();
+
+  lcd.setCursor(0,1);
+  lcd.print("Set: ");
+  lcd.print(setTemp,0);
+  lcd.print(" C");
 }
 
 /*****************************************************************************
@@ -62,22 +64,23 @@ void loop() {
     if(blinkFlag)
     {
       digitalWrite(LED_PIN, LOW);
-      lcd.setCursor(15,1);
+      lcd.setCursor(15,0);
       lcd.print("*");
     }
     else
     {
       digitalWrite(LED_PIN, HIGH);
-      lcd.setCursor(15,1);
+      lcd.setCursor(15,0);
       lcd.print(" ");
     }
     blinkFlag = !blinkFlag;
     blinkTime = timeNow;
 
     // Print temp info
-    sensors_event_t event;
-    dht.temperature().getEvent(&event);
-    if (isnan(event.temperature)) {
+    sensors_event_t temp_event, hum_event;
+    dht.temperature().getEvent(&temp_event);
+    dht.humidity().getEvent(&hum_event);
+    if (isnan(temp_event.temperature)) {
       lcd.clear();
       lcd.setCursor(0,0);
       lcd.print(F("Temp Error!"));
@@ -87,18 +90,15 @@ void loop() {
     else {
       lcd.setCursor(0,0);
       lcd.print("T: ");
-      lcd.print(event.temperature);
+      lcd.print(temp_event.temperature,0);
       lcd.print(" C");
+      lcd.print(" H: ");
+      lcd.print(hum_event.relative_humidity,0);
+      lcd.print("%");
     }
 
-    if(event.temperature < setTemp)
-    {
-      relayOn();
-    }
-    else
-    {
-      relayOff();
-    }
+    if(temp_event.temperature < setTemp) relayOn();
+    else relayOff();
   } // end blink
 
 }
@@ -106,12 +106,12 @@ void loop() {
 void relayOn()
 {
   digitalWrite(RELAY_PIN, HIGH);
-  lcd.setCursor(0,1);
-  lcd.print("Relay on");
+  lcd.setCursor(13,1);
+  lcd.print(" ON");
 }
 void relayOff()
 {
   digitalWrite(RELAY_PIN, LOW);
-  lcd.setCursor(0,1);
-  lcd.print("Relay off");
+  lcd.setCursor(13,1);
+  lcd.print("OFF");
 }
