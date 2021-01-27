@@ -15,8 +15,9 @@
 
 #define DHT_TYPE DHT22
 #define LED_PIN 13    // heartbeat LED
-#define RELAY_PIN A5  // TEMP SENSOR
-#define TEMP_PIN 2  // TEMP SENSOR
+#define NPN_E_PIN A4  // NPN EMITTER
+#define NPN_B_PIN A5  // NPN BASE (Turning relay on/off)
+#define TEMP_PIN A1  // TEMP SENSOR
 
 #define BLINK_PERIOD 1000
 
@@ -42,10 +43,12 @@ void setup() {
   Serial.begin(9600);
 
   pinMode(LED_PIN, OUTPUT);
-  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(NPN_E_PIN, OUTPUT);
+  pinMode(NPN_B_PIN, OUTPUT);
   pinMode(TEMP_PIN, INPUT);
 
-  digitalWrite(RELAY_PIN, LOW);
+  digitalWrite(NPN_E_PIN, LOW);
+  digitalWrite(NPN_B_PIN, LOW);
 
   // start temp sensor
   dht.begin();
@@ -151,13 +154,13 @@ void loop() {
 
 void relayOn()
 {
-  digitalWrite(RELAY_PIN, HIGH);
+  digitalWrite(NPN_B_PIN, HIGH);
   lcd.setCursor(13,1);
   lcd.print(" ON");
 }
 void relayOff()
 {
-  digitalWrite(RELAY_PIN, LOW);
+  digitalWrite(NPN_B_PIN, LOW);
   lcd.setCursor(13,1);
   lcd.print("OFF");
 }
